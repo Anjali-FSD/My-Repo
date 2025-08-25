@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Responsive To-Do List</title>
+<style>
+  :root {
+    --primary-color: #ff6f61;
+    --secondary-color: #f97f7f;
+    --bg-color: #fff;
+    --text-color: #333;
+    --border-radius: 8px;
+    --max-width: 900px;
+    --transition-time: 0.3s;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: #f4f6f8;
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .app-container {
+    background: var(--bg-color);
+    width: 100%;
+    max-width: var(--max-width);
+    display: flex;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    min-height: 500px;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--primary-color);
+    color: white;
+    padding: 30px 20px;
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .sidebar h2 {
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    font-size: 1.6rem;
+    letter-spacing: 1.5px;
+  }
+
+  .sidebar .profile {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .sidebar .profile img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 2px solid white;
+  }
+
+  .sidebar .profile b {
+    display: block;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .sidebar nav {
+    flex-grow: 1;
+  }
+
+  .sidebar nav button {
+    background: none;
+    border: none;
+    width: 100%;
+    color: white;
+    font-weight: 600;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    transition: background var(--transition-time);
+  }
+
+  .sidebar nav button:hover,
+  .sidebar nav button.active {
+    background: var(--secondary-color);
+  }
+
+  .sidebar .footer {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    opacity: 0.8;
+    text-align: center;
+    padding: 10px;
+    border-top: 1px solid rgba(255 255 255 / 0.2);
+  }
+
+  /* Main Content */
+  .main-content {
+    flex-grow: 1;
+    padding: 30px 40px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header h1 {
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.8rem;
+  }
+
+  .header .date {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    font-weight: 600;
+  }
+
+  .todo-input {
+    display: flex;
+    margin-bottom: 25px;
+  }
+
+  .todo-input input[type="text"] {
+    flex-grow: 1;
+    border: 1.5px solid #ccc;
+    border-radius: var(--border-radius);
+    padding: 12px 15px;
+    font-size: 1rem;
+    outline-offset: 2px;
+    transition: border-color var(--transition-time);
+  }
+
+  .todo-input input[type="text"]:focus {
+    border-color: var(--primary-color);
+  }
+
+  .todo-input button {
+    background: var(--primary-color);
+    border: none;
+    padding: 12px 25px;
+    margin-left: 15px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background var(--transition-time);
+  }
+
+  .todo-input button:hover {
+    background: var(--secondary-color);
+  }
+
+  .task-list {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  .task-item {
+    background: #f9f9f9;
+    border-radius: var(--border-radius);
+    padding: 15px 15px 15px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
+  }
+
+  .task-item.completed {
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+
+  .task-item input[type="checkbox"] {
+    transform: scale(1.3);
+    cursor: pointer;
+  }
+
+  .task-desc {
+    flex-grow: 1;
+    font-size: 1.05rem;
+    word-wrap: break-word;
+  }
+
+  .task-actions button {
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background var(--transition-time);
+  }
+
+  .task-actions button:hover {
+    background: var(--secondary-color);
+    color: white;
+  }
+
+  /* Progress Section */
+  .progress-section {
+    margin-top: 35px;
+  }
+
+  .progress-section h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+
+  .progress-bars {
+    display: flex;
+    gap: 25px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .progress-bar {
+    background: #eee;
+    border-radius: 15px;
+    width: 120px;
+    padding: 10px;
+    color: #333;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    box-shadow: 1px 1px 4px rgb(0 0 0 / 0.1);
+  }
+
+  .progress-bar > .progress-fill {
+    height: 18px;
+    border-radius: 10px;
+    margin-top: 8px;
+    background: var(--primary-color);
+    transition: width 0.5s ease-in-out;
+  }
+
+  .progress-completed {
+    background: #4caf50;
+  }
+
+  .progress-in-progress {
+    background: #2196f3;
+  }
+
+  .progress-not-started {
+    background: #f44336;
+  }
+
+  /* Scrollbar style for task list */
+  .task-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .task-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .task-list::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+  }
+
+  /* Responsive */
+  @media screen and (max-width: 768px) {
+    .app-container {
+      flex-direction: column;
+      max-width: 100%;
+      border-radius: 0;
+    }
+
+    .sidebar {
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 15px 20px;
+      align-items: center;
+    }
+
+    .sidebar nav {
+      display: flex;
+      gap: 10px;
+      flex-grow: 1;
+    }
+
+    .sidebar nav button {
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      margin-bottom: 0;
+      border-radius: 6px;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .sidebar .profile {
+      display: none;
+    }
+
+    .sidebar .footer {
+      font-size: 0.85rem;
+      color: #eee;
+      padding: 10px 5px;
+    }
+
+    .main-content {
+      padding: 20px 15px 30px;
+    }
+
+    .header h1 {
+      font-size: 1.4rem;
+    }
+
+    .todo-input {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .todo-input button {
+      margin-left: 0;
+      width: 100%;
+      padding: 12px 0;
+    }
+
+    .progress-bars {
+      justify-content: center;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app-container">
+  <aside class="sidebar">
+    <div class="profile">
+      <img src="https://sp.yimg.com/ib/th/id/OIP.SMCVb0EbEsETa5PD9_44egHaNc?pid=Api&w=148&h=148&c=7&rs=1" alt="Profile" />
+      <b>Lucky</b>
+    </div>
+    <nav>
+      <button class="active" data-category="all">Dashboard</button>
+      <button data-category="vital">Vital Task</button>
+      <button data-category="mytask">My Task</button>
+      <button data-category="completed">Completed</button>
+      <button data-category="help">Help</button>
+    </nav>
+    <div class="footer" title="Logout">Logout</div>
+  </aside>
+  <main class="main-content">
+    <header class="header">
+      <h1>Welcome back, Lucky 👋</h1>
+      <div class="date" id="current-date"></div>
+    </header>
+    <form id="task-form" class="todo-input" autocomplete="off">
+      <input type="text" id="new-task-input" placeholder="Add a new task..." required />
+      <button type="submit">Add Task</button>
+    </form>
+    <section class="task-list" id="task-list"></section>
+    <section class="progress-section" aria-label="Task progress">
+      <h2>Task Progress</h2>
+      <div class="progress-bars">
+        <div>
+          <div class="progress-bar-label">Completed</div>
+          <div class="progress-bar">
+            <div id="progress-completed" class="progress-fill progress-completed" style="width:0%"></div>
+            <div id="progress-completed-text"></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-bar-label">In Progress</div>
+          <div class="progress-bar">
+            <div id="progress-in-progress" class="progress-fill progress-in-progress" style="width:0%"></div>
+            <div id="progress-in-progress-text"></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-bar-label">Not Started</div>
+          <div class="progress-bar">
+            <div id="progress-not-started" class="progress-fill progress-not-started" style="width:0%"></div>
+            <div id="progress-not-started-text"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  // Some fake category mapping for demo
+  const CATEGORY_NAMES = ['Dashboard', 'Vital Task', 'My Task', 'Completed', 'Help'];
+
+  // Task structure: {id, desc, completed, category}
+
+  let tasks = [
+    {id: 1, desc: 'Attend Nischal’s birthday party', completed: false, category:'vital'},
+    {id: 2, desc: 'Landing page design for TravelDays', completed: false, category:'mytask'},
+    {id: 3, desc: 'Presentation on Final Product', completed: false, category:'mytask'},
+    {id: 4, desc: 'Walk the dog', completed: true, category:'completed'},
+    {id: 5, desc: 'Conduct meeting', completed: true, category:'completed'}
+  ];
+
+  const taskListElem = document.getElementById('task-list');
+  const taskForm = document.getElementById('task-form');
+  const newTaskInput = document.getElementById('new-task-input');
+  const currentDateElem = document.getElementById('current-date');
+
+  const progressCompletedElem = document.getElementById('progress-completed');
+  const progressInProgressElem = document.getElementById('progress-in-progress');
+  const progressNotStartedElem = document.getElementById('progress-not-started');
+
+  const progressCompletedText = document.getElementById('progress-completed-text');
+  const progressInProgressText = document.getElementById('progress-in-progress-text');
+  const progressNotStartedText = document.getElementById('progress-not-started-text');
+
+  // Sidebar buttons for category filter
+  document.querySelectorAll('.sidebar nav button').forEach(btn=>{
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar nav button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTasks(btn.dataset.category);
+    });
+  });
+
+  function renderTasks(filterCategory = 'all') {
+    taskListElem.innerHTML = '';
+
+    // Filter tasks according to category
+    let filteredTasks = tasks;
+    if (filterCategory !== 'all' && filterCategory !== 'completed' && filterCategory !== 'help') {
+      filteredTasks = tasks.filter(t => t.category === filterCategory && !t.completed);
+    } else if(filterCategory === 'completed'){
+      filteredTasks = tasks.filter(t => t.completed);
+    } else if(filterCategory === 'help'){
+      filteredTasks = [ {id:'help', desc: 'For help, contact support@example.com', completed: false, category:'help'} ];
+    }
+
+    filteredTasks.forEach(task => {
+      const taskItem = document.createElement('div');
+      taskItem.className = 'task-item' + (task.completed ? ' completed' : '');
+      taskItem.setAttribute('data-id', task.id);
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.completed;
+      checkbox.title = task.completed ? 'Mark as not completed' : 'Mark as completed';
+      checkbox.addEventListener('change', () => toggleTaskCompletion(task.id));
+
+      const desc = document.createElement('div');
+      desc.className = 'task-desc';
+      desc.contentEditable = !task.completed;
+      desc.spellcheck = false;
+      desc.innerText = task.desc;
+      desc.addEventListener('blur', () => updateTaskDesc(task.id, desc.innerText));
+
+      const actions = document.createElement('div');
+      actions.className = 'task-actions';
+
+      if(task.id !== 'help'){
+        const delBtn = document.createElement('button');
+        delBtn.innerHTML = '&#x2716;';
+        delBtn.title = 'Delete task';
+        delBtn.addEventListener('click', () => deleteTask(task.id));
+        actions.appendChild(delBtn);
+      }
+
+      taskItem.appendChild(checkbox);
+      taskItem.appendChild(desc);
+      taskItem.appendChild(actions);
+
+      taskListElem.appendChild(taskItem);
+    });
+
+    updateProgress();
+  }
+
+  function toggleTaskCompletion(id) {
+    tasks = tasks.map(t => t.id === id ? {...t, completed: !t.completed} : t);
+    renderTasks(getCurrentFilter());
+  }
+
+  function updateTaskDesc(id, newDesc) {
+    tasks = tasks.map(t => t.id === id ? {...t, desc: newDesc.trim() || t.desc} : t);
+    renderTasks(getCurrentFilter());
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    renderTasks(getCurrentFilter());
+  }
+
+  function addTask(desc) {
+    const nextId = tasks.length ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+    tasks.push({id: nextId, desc, completed: false, category: 'mytask'});
+    renderTasks(getCurrentFilter());
+  }
+
+  function getCurrentFilter() {
+    const activeBtn = document.querySelector('.sidebar nav button.active');
+    return activeBtn ? activeBtn.dataset.category : 'all';
+  }
+
+  function updateProgress() {
+    const totalTasks = tasks.length;
+    if (totalTasks === 0) {
+      progressCompletedElem.style.width = '0%';
+      progressInProgressElem.style.width = '0%';
+      progressNotStartedElem.style.width = '0%';
+
+      progressCompletedText.innerText = '0%';
+      progressInProgressText.innerText = '0%';
+      progressNotStartedText.innerText = '0%';
+      return;
+    }
+
+    const completedCount = tasks.filter(t => t.completed).length;
+    const inProgressCount = tasks.filter(t => !t.completed && t.category !== 'mytask').length;
+    const notStartedCount = tasks.filter(t => !t.completed && t.category === 'mytask').length;
+
+    const completedPercent = Math.round((completedCount / totalTasks) * 100);
+    const inProgressPercent = Math.round((inProgressCount / totalTasks) * 100);
+    const notStartedPercent = Math.round((notStartedCount / totalTasks) * 100);
+
+    progressCompletedElem.style.width = completedPercent + '%';
+    progressInProgressElem.style.width = inProgressPercent + '%';
+    progressNotStartedElem.style.width = notStartedPercent + '%';
+
+    progressCompletedText.innerText = completedPercent + '%';
+    progressInProgressText.innerText = inProgressPercent + '%';
+    progressNotStartedText.innerText = notStartedPercent + '%';
+  }
+
+  function formatDate() {
+    const now = new Date();
+    const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+    return now.toLocaleDateString(undefined, options);
+  }
+
+  // Form submit handler
+  taskForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const taskDesc = newTaskInput.value.trim();
+    if (taskDesc) {
+      addTask(taskDesc);
+      newTaskInput.value = '';
+    }
+  });
+  // Initialization
+  currentDateElem.innerText = formatDate();
+  renderTasks('all');
+</script>
+</body>
+</html>
